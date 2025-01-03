@@ -1,17 +1,43 @@
 package org.sparkTest;
 
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Row;
+import org.apache.spark.sql.SparkSession;
+
+
 public class Main {
     public static void main(String[] args) {
-        //TIP Press <shortcut actionId="ShowIntentionActions"/> with your caret at the highlighted text
-        // to see how IntelliJ IDEA suggests fixing it.
-        System.out.printf("Hello and welcome!");
 
-        for (int i = 1; i <= 5; i++) {
-            //TIP Press <shortcut actionId="Debug"/> to start debugging your code. We have set one <icon src="AllIcons.Debugger.Db_set_breakpoint"/> breakpoint
-            // for you, but you can always add more by pressing <shortcut actionId="ToggleLineBreakpoint"/>.
-            System.out.println("i = " + i);
+
+        // Ruta del archivo CSV
+        String rutaArchivoCSV = "/Users/gorge213/Desktop/Spark/SparkProject/src/main/resources/Data.csv";
+
+        // Crear una sesión de Spark
+        SparkSession spark = SparkSession.builder()
+                .appName("LeerCSVConSpark")
+                .master("local[*]")
+                .getOrCreate();
+        try {
+            // Leer el archivo CSV en un DataFrame
+            Dataset<Row> datos = spark.read()
+                    .option("header", "true")  // Indica que el archivo CSV tiene encabezados
+                    .option("inferSchema", "true")
+                    .option("delimiter", ";")
+                    .csv(rutaArchivoCSV);
+
+            // Mostrar el esquema del DataFrame
+            System.out.println("Esquema del DataFrame:");
+            datos.printSchema();
+
+            // Mostrar una muestra de datos
+            System.out.println("Muestra de datos:");
+            datos.show(10);  // Muestra las primeras 10 filas
+
+        } catch (Exception e) {
+            System.err.println("Error al leer el archivo CSV: " + e.getMessage());
+        } finally {
+            // Detener la sesión de Spark
+            spark.stop();
         }
     }
 }
